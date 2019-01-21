@@ -1,0 +1,10 @@
+{
+  "id": "darkerNightsUPF",
+  "name": "Darker Nights UPF Patcher",
+  "author": "Shybert",
+  "version": "0.1.0",
+  "description": "Darker Nights UPF Patcher",
+  "requires": ["unifiedPatchingFramework"],
+  "moduleLoader": "UPF",
+  "canHotLoad": true
+}
