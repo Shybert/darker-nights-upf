@@ -1,5 +1,13 @@
 /* global info, xelib, registerPatcher, patcherUrl */
 
+function multiplyColors (record, path, multiplier) {
+  xelib.GetElements(record, path).forEach(colorElement => {
+    const value = xelib.GetIntValue(colorElement)
+    if (!value) return
+    xelib.SetIntValue(colorElement, '', Math.floor(value * multiplier))
+  })
+}
+
 registerPatcher({
   info: info,
   gameModes: [xelib.gmSSE, xelib.gmTES5],
@@ -36,7 +44,7 @@ registerPatcher({
         signature: 'WTHR'
       },
       patch: function (record) {
-        helpers.logMessage(`Patching ${xelib.LongName(record)}`)
+        multiplyColors(record, 'NAM0\\Sky-Upper\\Night', locals.mults.skyNightMult)
       }
     }]
   })
