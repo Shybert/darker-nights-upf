@@ -45,6 +45,20 @@ registerPatcher({
       },
       patch: function (record) {
         multiplyColors(record, 'NAM0\\Sky-Upper\\Night', locals.mults.skyNightMult)
+        multiplyColors(record, 'NAM0\\Fog Near\\Night', locals.mults.mystNightMult)
+        multiplyColors(record, 'NAM0\\Ambient\\Sunset', locals.mults.ambientDuskDawnMult)
+        multiplyColors(record, 'NAM0\\Ambient\\Night', locals.mults.ambientNightMult)
+        multiplyColors(record, 'NAM0\\Ambient\\Sunrise', locals.mults.ambientDuskDawnMult)
+        multiplyColors(record, 'NAM0\\Sunlight\\Night', locals.mults.nightMult)
+        multiplyColors(record, 'NAM0\\Stars\\Sunset', locals.mults.starsMult)
+        multiplyColors(record, 'NAM0\\Stars\\Night', locals.mults.starsMult)
+        multiplyColors(record, 'NAM0\\Stars\\Sunrise', locals.mults.starsMult)
+        multiplyColors(record, 'NAM0\\Sky-Lower\\Night', locals.mults.skyNightMult)
+        multiplyColors(record, 'NAM0\\Horizon\\Night', locals.mults.skyNightMult)
+        multiplyColors(record, 'NAM0\\Effect Lighting\\Night', locals.mults.rainNightMult)
+        multiplyColors(record, 'NAM0\\Fog Far\\Night', locals.mults.mystNightMult)
+        multiplyColors(record, 'NAM0\\Sky Statics\\Night', locals.mults.skyNightMult)
+        multiplyColors(record, 'NAM0\\Water Multiplier\\Night', locals.mults.nightMult)
       }
     }]
   })
