@@ -8,6 +8,11 @@ function multiplyColors (record, path, multiplier) {
   })
 }
 
+function isEffect (record) {
+  const edid = xelib.EditorID(record)
+  return edid ? edid.startsWith('FX') : false
+}
+
 registerPatcher({
   info: info,
   gameModes: [xelib.gmSSE, xelib.gmTES5],
@@ -44,6 +49,15 @@ registerPatcher({
         signature: 'WTHR'
       },
       patch: function (record) {
+        const effect = isEffect(record)
+        if (effect) {
+          multiplyColors(record, 'NAM0\\Effect Lighting\\Sunrise', locals.mults.effectDuskDawnMult)
+          multiplyColors(record, 'NAM0\\Effect Lighting\\Day', locals.mults.effectDayMult)
+          multiplyColors(record, 'NAM0\\Effect Lighting\\Sunset', locals.mults.effectDuskDawnMult)
+          multiplyColors(record, 'NAM0\\Effect Lighting\\Night', locals.mults.effectNightMult)
+          return
+        }
+
         multiplyColors(record, 'NAM0\\Sky-Upper\\Night', locals.mults.skyNightMult)
         multiplyColors(record, 'NAM0\\Fog Near\\Night', locals.mults.mystNightMult)
         multiplyColors(record, 'NAM0\\Ambient\\Sunset', locals.mults.ambientDuskDawnMult)
