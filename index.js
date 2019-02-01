@@ -1,10 +1,20 @@
 /* global info, xelib, registerPatcher, patcherUrl */
 
-function multiplyColors (record, path, multiplier) {
-  xelib.GetElements(record, path).forEach(colorElement => {
+function multiplyColors (colorElements, multiplier) {
+  colorElements.forEach(colorElement => {
     const value = xelib.GetIntValue(colorElement)
     if (!value) return
     xelib.SetIntValue(colorElement, '', Math.floor(value * multiplier))
+  })
+}
+
+function multiplyWeatherColors (weatherRecord, weatherColorName, multiplier) {
+  multiplyColors(xelib.GetElements(weatherRecord, `NAM0\\${weatherColorName}`), multiplier)
+}
+
+function multiplyDALC (weatherRecord, timeOfDay, multiplier) {
+  xelib.GetElements(weatherRecord, `Directional Ambient Lighting Colors\\DALC - ${timeOfDay}\\Directional`).forEach(direction => {
+    multiplyColors(xelib.GetElements(direction), multiplier)
   })
 }
 
@@ -43,36 +53,45 @@ registerPatcher({
         skyDuskDawnMult: 1 + base * 0.25,
         starsMult: 0.8
       }
+
+      locals.weatherColors = [
+        { name: 'Sky-Upper\\Night', multiplierType: 'skyNightMult' },
+        { name: 'Fog Near\\Night', multiplierType: 'mystNightMult' },
+        { name: 'Ambient\\Sunrise', multiplierType: 'ambientDuskDawnMult' },
+        { name: 'Ambient\\Sunset', multiplierType: 'ambientDuskDawnMult' },
+        { name: 'Ambient\\Night', multiplierType: 'ambientNightMult' },
+        { name: 'Sunlight\\Night', multiplierType: 'nightMult' },
+        { name: 'Stars\\Sunrise', multiplierType: 'starsMult' },
+        { name: 'Stars\\Sunset', multiplierType: 'starsMult' },
+        { name: 'Stars\\Night', multiplierType: 'starsMult' },
+        { name: 'Sky-Lower\\Night', multiplierType: 'skyNightMult' },
+        { name: 'Horizon\\Night', multiplierType: 'skyNightMult' },
+        { name: 'Effect Lighting\\Night', multiplierType: 'rainNightMult' },
+        { name: 'Fog Far\\Night', multiplierType: 'mystNightMult' },
+        { name: 'Sky Statics\\Night', multiplierType: 'skyNightMult' },
+        { name: 'Water Multiplier\\Night', multiplierType: 'nightMult' }
+      ]
     },
     process: [{
       load: {
         signature: 'WTHR'
       },
       patch: function (record) {
-        const effect = isEffect(record)
-        if (effect) {
-          multiplyColors(record, 'NAM0\\Effect Lighting\\Sunrise', locals.mults.effectDuskDawnMult)
-          multiplyColors(record, 'NAM0\\Effect Lighting\\Day', locals.mults.effectDayMult)
-          multiplyColors(record, 'NAM0\\Effect Lighting\\Sunset', locals.mults.effectDuskDawnMult)
-          multiplyColors(record, 'NAM0\\Effect Lighting\\Night', locals.mults.effectNightMult)
+        if (isEffect(record)) {
+          multiplyWeatherColors(record, 'Effect Lighting\\Sunrise', locals.mults.effectDuskDawnMult)
+          multiplyWeatherColors(record, 'Effect Lighting\\Day', locals.mults.effectDayMult)
+          multiplyWeatherColors(record, 'Effect Lighting\\Sunset', locals.mults.effectDuskDawnMult)
+          multiplyWeatherColors(record, 'Effect Lighting\\Night', locals.mults.effectNightMult)
           return
         }
 
-        multiplyColors(record, 'NAM0\\Sky-Upper\\Night', locals.mults.skyNightMult)
-        multiplyColors(record, 'NAM0\\Fog Near\\Night', locals.mults.mystNightMult)
-        multiplyColors(record, 'NAM0\\Ambient\\Sunset', locals.mults.ambientDuskDawnMult)
-        multiplyColors(record, 'NAM0\\Ambient\\Night', locals.mults.ambientNightMult)
-        multiplyColors(record, 'NAM0\\Ambient\\Sunrise', locals.mults.ambientDuskDawnMult)
-        multiplyColors(record, 'NAM0\\Sunlight\\Night', locals.mults.nightMult)
-        multiplyColors(record, 'NAM0\\Stars\\Sunset', locals.mults.starsMult)
-        multiplyColors(record, 'NAM0\\Stars\\Night', locals.mults.starsMult)
-        multiplyColors(record, 'NAM0\\Stars\\Sunrise', locals.mults.starsMult)
-        multiplyColors(record, 'NAM0\\Sky-Lower\\Night', locals.mults.skyNightMult)
-        multiplyColors(record, 'NAM0\\Horizon\\Night', locals.mults.skyNightMult)
-        multiplyColors(record, 'NAM0\\Effect Lighting\\Night', locals.mults.rainNightMult)
-        multiplyColors(record, 'NAM0\\Fog Far\\Night', locals.mults.mystNightMult)
-        multiplyColors(record, 'NAM0\\Sky Statics\\Night', locals.mults.skyNightMult)
-        multiplyColors(record, 'NAM0\\Water Multiplier\\Night', locals.mults.nightMult)
+        locals.weatherColors.forEach(weatherColor => {
+          multiplyWeatherColors(record, weatherColor.name, locals.mults[weatherColor.multiplierType])
+        })
+
+        multiplyDALC(record, 'Sunrise', locals.mults.ambientDuskDawnMult)
+        multiplyDALC(record, 'Night', locals.mults.ambientNightMult)
+        multiplyDALC(record, 'Sunset', locals.mults.ambientDuskDawnMult)
       }
     }]
   })
