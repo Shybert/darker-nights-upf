@@ -18,6 +18,12 @@ function multiplyDALC (weatherRecord, timeOfDay, multiplier) {
   })
 }
 
+function multiplyCloudColors (weatherRecord, multiplier) {
+  xelib.GetElements(weatherRecord, 'PNAM').forEach(layer => xelib.GetElements(layer).forEach(timeOfDayElement => {
+    multiplyColors(xelib.GetElements(timeOfDayElement), multiplier)
+  }))
+}
+
 function isEffect (record) {
   const edid = xelib.EditorID(record)
   return edid ? edid.startsWith('FX') : false
@@ -92,6 +98,8 @@ registerPatcher({
         multiplyDALC(record, 'Sunrise', locals.mults.ambientDuskDawnMult)
         multiplyDALC(record, 'Night', locals.mults.ambientNightMult)
         multiplyDALC(record, 'Sunset', locals.mults.ambientDuskDawnMult)
+
+        multiplyCloudColors(record, 0.5)
       }
     }]
   })
