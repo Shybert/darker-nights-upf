@@ -2,7 +2,7 @@
 
 function multiplyColors (colorElements, multiplier) {
   colorElements.forEach(colorElement => {
-    const value = xelib.GetIntValue(colorElement)
+    const value = Number.parseInt(xelib.GetValue(colorElement), 10)
     if (!value) return
     xelib.SetIntValue(colorElement, '', Math.floor(value * multiplier))
   })
