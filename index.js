@@ -26,9 +26,8 @@ function multiplyCloudColors (weatherRecord, dawnMultiplier, duskMultiplier, nig
   })
 }
 
-function isEffect (record) {
-  const edid = xelib.EditorID(record)
-  return edid ? edid.startsWith('FX') : false
+function isEffect (edid) {
+  return edid.startsWith('FX')
 }
 
 registerPatcher({
@@ -37,7 +36,27 @@ registerPatcher({
   settings: {
     label: 'Darker Nights UPF Patcher',
     templateUrl: `${patcherUrl}/partials/settings.html`,
-    defaultSettings: {}
+    defaultSettings: {
+      excludedWeathers: [
+        'BlackreachWeather',
+        'SovngardeFog',
+        'WorldMapWeather',
+        'SovngardeClear',
+        'SovngardeDark',
+        'SoulCairnAmb01',
+        'SoulCairnAurora',
+        'SoulCairnAmb01_Rain',
+        'SoulCairnAmb02',
+        'SoulCairnAmb03',
+        'SoulCairnAmb04',
+        'DLC2ApocryphaWeather',
+        'DLC2ApocryphaWeatherNew',
+        'SolitudeBluePalaceFogARENA',
+        'SolitudeBluePalaceFogFEAR',
+        'SolitudeBluePalaceFogNMARE',
+        'SolitudeBluePalaceFog'
+      ]
+    }
   },
   execute: (patchFile, helpers, settings, locals) => ({
     initialize: (patchFile, helpers, settings, locals) => {
@@ -85,7 +104,10 @@ registerPatcher({
         signature: 'WTHR'
       },
       patch: function (record) {
-        if (isEffect(record)) {
+        const edid = xelib.EditorID(record)
+        if (edid && settings.excludedWeathers.includes(edid)) return
+
+        if (edid && isEffect(edid)) {
           multiplyWeatherColors(record, 'Effect Lighting\\Sunrise', locals.mults.effectDuskDawnMult)
           multiplyWeatherColors(record, 'Effect Lighting\\Day', locals.mults.effectDayMult)
           multiplyWeatherColors(record, 'Effect Lighting\\Sunset', locals.mults.effectDuskDawnMult)
